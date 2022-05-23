@@ -24,18 +24,11 @@ mvn clean package -Dbuild.number=${BUILD_NUMBER} -DSHA=$(git rev-parse --short H
 
 ## サンプルコード
 
-`onEnable` で、`plugins/プラグイン名/updater.yml` を生成し、`onDisable` では、アップデート処理を待機させます。
-
-`onEnable` 内で、`initBukkit, initBungee` を実行しても構いません。
+`onEnable` で、`new PluginUpdater().initBukkit(this);` または `initBungee(this);` を実行してください。
 
 ```java
 @Override
 public void onEnable() {
-	new PluginUpdater().initConfig();
-}
-
-@Override
-public void onDisable() {
 	// Bukkit
 	new PluginUpdater().initBukkit(this);
 
