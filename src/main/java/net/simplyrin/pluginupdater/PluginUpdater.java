@@ -49,11 +49,11 @@ import net.simplyrin.config.Configuration;
  */
 public class PluginUpdater {
 	
-	private final String name;
-	private final String version;
-	private final int currentBuildNumber;
+	private String name;
+	private String version;
+	private int currentBuildNumber;
 	
-	private final File dataFolder;
+	private File dataFolder;
 	private File pluginJar;
 	
 	private boolean enabled;
@@ -65,7 +65,7 @@ public class PluginUpdater {
 	private String username;
 	private String password;
 	
-	public PluginUpdater(JavaPlugin plugin) {
+	public void initBukkit(JavaPlugin plugin) {
 		this.name = plugin.getDescription().getName();
 		this.version = plugin.getDescription().getVersion();
 		this.currentBuildNumber = Integer.valueOf(this.version.split("[:]")[4]);
@@ -83,8 +83,8 @@ public class PluginUpdater {
 		
 		this.addShutdownHook();
 	}
-	
-	public PluginUpdater(Plugin plugin) {
+
+	public void initBungee(Plugin plugin) {
 		this.name = plugin.getDescription().getName();
 		this.version = plugin.getDescription().getVersion();
 		this.currentBuildNumber = Integer.valueOf(this.version.split("[:]")[4]);
