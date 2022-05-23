@@ -2,6 +2,8 @@
 
 Jenkins でビルドされてるプラグインをサーバー終了時アップデートできる物。
 
+BungeeCord、Bukkit に対応
+
 # Setup
 
 ## プラグインバージョン
@@ -18,6 +20,28 @@ version: git:${project.name}:${project.version}:${SHA}:${build.number}
 
 ```
 mvn clean package -Dbuild.number=${BUILD_NUMBER} -DSHA=$(git rev-parse --short HEAD)
+```
+
+## サンプルコード
+
+`onEnable` で、`plugins/プラグイン名/updater.yml` を生成し、`onDisable` では、アップデート処理を待機させます。
+
+`onEnable` 内で、`initBukkit, initBungee` を実行しても構いません。
+
+```java
+@Override
+public void onEnable() {
+	new PluginUpdater().initConfig();
+}
+
+@Override
+public void onDisable() {
+	// Bukkit
+	new PluginUpdater().initBukkit(this);
+
+	// Bungee
+	new PluginUpdater().initBungee(this);
+}
 ```
 
 # Maven Repository
