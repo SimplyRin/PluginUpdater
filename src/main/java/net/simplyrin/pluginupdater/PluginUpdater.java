@@ -168,6 +168,44 @@ public class PluginUpdater {
 		return this;
 	}
 	
+	// アップデート確認
+	public UpdateInfo checkUpdate() {
+		try {
+			var connection = (HttpsURLConnection) new URL(this.url + "lastStableBuild/api/json").openConnection();
+			connection.addRequestProperty("user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/101.0.4951.67 Safari/537.36");
+			if (this.basicAuthEnabled) {
+				connection.setRequestProperty("Authorization", "Basic " + Base64.getEncoder().encodeToString((this.username + ":" + this.password).getBytes()));
+			}
+			
+			var result = IOUtils.toString(connection.getInputStream(), StandardCharsets.UTF_8);
+			
+			JsonObject json = new JsonParser().parse(result).getAsJsonObject();
+			
+			int buildNumber = json.get("number").getAsInt();
+			if (buildNumber == Integer.valueOf(this.currentBuildNumber)) {
+				return new UpdateInfo(false, this.currentBuildNumber, buildNumber, null, null);
+			}
+			
+			JsonArray artifacts = json.get("artifacts").getAsJsonArray();
+			if (artifacts.size() == 0) {
+				return new UpdateInfo(true, this.currentBuildNumber, buildNumber, null, null);
+			}
+			
+			JsonObject child = artifacts.get(0).getAsJsonObject();
+			String relativePath = child.get("relativePath").getAsString();
+			
+			String projectUrl = url + buildNumber + "/";
+			String artifactUrl = url + "lastStableBuild/artifact/" + relativePath;
+			
+			return new UpdateInfo(true, this.currentBuildNumber, buildNumber, projectUrl, artifactUrl);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
+	
+	// シャットダウン時、プラグインのアップデートを実行させる
 	private PluginUpdater addShutdownHook() {
 		if (!enabled) {
 			return this;
